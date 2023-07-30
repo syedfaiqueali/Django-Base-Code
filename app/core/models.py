@@ -21,6 +21,14 @@ def recipe_image_file_path(instance, filename):
     return os.path.join('uploads', 'recipe', filename)
 
 
+def user_image_file_path(instance, filename):
+    """Generate file path for new recipe image."""
+    ext = os.path.splitext(filename)[1]
+    filename = f'{uuid.uuid4()}{ext}'
+
+    return os.path.join('uploads', 'user-images', filename)
+
+
 class UserManager(BaseUserManager):
     """Manager for users."""
 
@@ -50,6 +58,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    address = models.CharField(max_length=255, blank=True)
+    image = models.ImageField(null=True, upload_to=user_image_file_path)
 
     objects = UserManager()
 
