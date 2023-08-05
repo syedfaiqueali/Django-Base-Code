@@ -16,7 +16,7 @@ This repo contains ready-to use base code for django applications.
 - Ready to use as a base code
 - Usage Examples
     - Example:01 - Recipe, Ingredients, Recipe-Tags APIs
-    - Example:02 - *[Work in Process]* Netflix APIs
+    - Example:02 - *[Work in Process]* E-commerce APIs
 
 
 ## Prerequisites
