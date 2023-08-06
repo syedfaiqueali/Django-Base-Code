@@ -47,6 +47,6 @@ class UserAdmin(BaseUserAdmin):
 # Register those models here that are manageable via Django Admin
 # Set custom class i.e. 'UserAdmin'
 admin.site.register(models.User, UserAdmin)
-admin.site.register(models.Recipe)
-admin.site.register(models.Tag)
-admin.site.register(models.Ingredient)
+# admin.site.register(models.Recipe)
+# admin.site.register(models.Tag)
+# admin.site.register(models.Ingredient)

@@ -14,8 +14,13 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ['email', 'password', 'name', 'address', 'image']
-        extra_kwargs = {'password': {'write_only': True, 'min_length': 5}}
+        fields = [
+            'email', 'password', 'name', 'address', 'image',
+            'created_at', 'updated_at', 'user_type',
+        ]
+        extra_kwargs = {
+            'password': {'write_only': True, 'min_length': 5}
+        }
 
     def create(self, validated_data):
         """Create and return a user with encrypted password."""
@@ -24,8 +29,15 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """Update and return user."""
 
-        # Remove password after retrieving it
+        if 'user_type' in validated_data:
+            response_user_type = validated_data.pop('user_type')
+            if (response_user_type != instance.user_type):
+                msg = {'message': 'User type cannot be modified'}
+                raise serializers.ValidationError(msg)
+
+        # Extract attrs from validated_data
         password = validated_data.pop('password', None)
+
         user = super().update(instance, validated_data)
 
         if password:
