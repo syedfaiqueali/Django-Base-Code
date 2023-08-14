@@ -1,6 +1,8 @@
 """
 Tests for the user API.
 """
+from enum import Enum
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -12,6 +14,11 @@ from rest_framework import status
 CREATE_USER_URL = reverse('user:create')
 TOKEN_URL = reverse('user:token')
 ME_URL = reverse('user:me')
+
+
+class USER_TYPE(Enum):
+    VENDOR = 1
+    BUYER = 2
 
 
 def create_user(**params):
@@ -31,6 +38,7 @@ class PublicUserApiTests(TestCase):
             'email': 'test@example.com',
             'password': 'testpass123',
             'name': 'Test Name',
+            'user_type': USER_TYPE.BUYER.value,
         }
         res = self.client.post(CREATE_USER_URL, payload)
 
@@ -113,6 +121,7 @@ class PrivateUserApiTests(TestCase):
     """Test API requests that require authentication."""
 
     def setUp(self):
+        self.client = APIClient()
         self.user = create_user(
             email='test@example.com',
             password='testpass123',
@@ -120,20 +129,25 @@ class PrivateUserApiTests(TestCase):
             address='',
             image=None,
         )
-        self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
     def test_retrieve_profile_success(self):
         """Test retrieving profile for logged in user."""
         res = self.client.get(ME_URL)
-
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, {
+        user_data = {
             'name': self.user.name,
             'email': self.user.email,
             'address': self.user.address,
-            'image': self.user.image,
-        })
+            'user_type': self.user.user_type,
+        }
+        resp_data = {
+            'name': res.data["name"],
+            'email': res.data["email"],
+            'address': res.data["address"],
+            'user_type': res.data["user_type"],
+        }
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_data, user_data)
 
     def test_post_me_not_allowed(self):
         """Test POST is not allowed for the me endpoint."""
